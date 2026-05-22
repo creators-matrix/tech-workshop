@@ -133,7 +133,7 @@ function imageToBase64() {
     var reader = new FileReader();
     reader.onload = function(e) {
         document.getElementById('imageBase64').value = e.target.result;
-        document.getElementById('imagePreview').innerHTML = '<img src="'+e.target.result+'" class="max-h-36 rounded" alt="preview">';
+        document.getElementById('imagePreview').innerHTML = '<img src="'+e.target.result+'" class="max-h-36 rounded" alt="preview" loading="lazy">';
         showMsg('✅ 图片已编码 (' + (e.target.result.length/1024).toFixed(1) + ' KB)', 'text-emerald-400');
     };
     reader.readAsDataURL(file);
