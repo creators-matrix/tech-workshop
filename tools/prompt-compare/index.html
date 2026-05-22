@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../../assets/avatar.png">
+    <title>AI Prompt效果对比器 — Prompt A/B对比分析 | laomunong.com</title>
+    <meta name="description" content="左右分栏对比两个AI Prompt。自动分析Token消耗、关键词密度、结构完整性。帮你写出更高效的Prompt。纯前端，Prompt不上传。">
+    <link rel="canonical" href="https://laomunong.com/tech-workshop/tools/prompt-compare/">
+    <meta property="og:title" content="AI Prompt效果对比器 | laomunong.com">
+    <meta property="og:description" content="左右分栏对比Prompt，Token分析+结构评分。纯前端。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://laomunong.com/tech-workshop/tools/prompt-compare/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="google-site-verification" content="WBd5ihUqyGU_WVKMVppCAk2anl58qI1BSkAh-lMDjCs">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7499717658670470" crossorigin="anonymous"></script>
+</head>
+<body class="bg-stone-950 text-stone-200 min-h-screen flex flex-col font-sans">
+
+<header class="border-b border-stone-800 bg-stone-950 px-6 py-5">
+    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+            <div class="text-[11px] text-stone-500 font-mono mb-1">
+                <a href="../../../" class="hover:text-emerald-400 transition-colors">Matrix</a>
+                <span class="text-stone-700"> / </span>
+                <a href="../../" class="hover:text-emerald-400 transition-colors">Tech Workshop</a>
+                <span class="text-stone-700"> / </span>
+                <span class="text-emerald-400">Prompt Compare</span>
+            </div>
+            <h1 class="text-xl font-black text-stone-100 tracking-tight">⚡ AI Prompt <span class="text-emerald-400">效果对比器</span></h1>
+        </div>
+        <a href="../../" class="text-xs text-stone-500 hover:text-emerald-400 border border-stone-700 rounded-lg px-3 py-1.5 transition-colors shrink-0">← 返回工坊</a>
+    </div>
+</header>
+
+<main class="max-w-5xl mx-auto p-6 flex-grow">
+
+<section class="bg-stone-900 border border-stone-700 rounded-xl p-6 mb-6">
+    <h2 class="text-sm text-stone-400 uppercase tracking-widest border-b border-stone-800 pb-2 mb-4">// PROMPT_COMPARATOR / A/B对比</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+            <div class="flex items-center justify-between mb-1">
+                <label class="text-xs text-sky-400 font-bold">Prompt A</label>
+                <button onclick="loadSample('a')" class="text-[10px] text-stone-500 hover:text-sky-400 border border-stone-700 rounded px-2 py-0.5 transition">加载示例</button>
+            </div>
+            <textarea id="promptA" oninput="analyze()" rows="12" placeholder="输入第一个Prompt..." class="w-full bg-stone-800 border border-stone-700 rounded-lg p-3 text-stone-200 text-sm font-mono focus:outline-none focus:border-sky-500 resize-none"></textarea>
+        </div>
+        <div>
+            <div class="flex items-center justify-between mb-1">
+                <label class="text-xs text-amber-400 font-bold">Prompt B</label>
+                <button onclick="loadSample('b')" class="text-[10px] text-stone-500 hover:text-amber-400 border border-stone-700 rounded px-2 py-0.5 transition">加载示例</button>
+            </div>
+            <textarea id="promptB" oninput="analyze()" rows="12" placeholder="输入第二个Prompt..." class="w-full bg-stone-800 border border-stone-700 rounded-lg p-3 text-stone-200 text-sm font-mono focus:outline-none focus:border-amber-500 resize-none"></textarea>
+        </div>
+    </div>
+
+    <!-- 对比结果面板 -->
+    <div id="compareResult" class="hidden bg-stone-800 border border-stone-700 rounded-lg p-4">
+        <div class="grid grid-cols-3 gap-4 text-center mb-4 border-b border-stone-700 pb-4">
+            <div>
+                <span class="text-[10px] text-stone-500 block">指标</span>
+            </div>
+            <div>
+                <span class="text-[10px] text-sky-400 block">Prompt A</span>
+            </div>
+            <div>
+                <span class="text-[10px] text-amber-400 block">Prompt B</span>
+            </div>
+        </div>
+        <div class="grid grid-cols-3 gap-4 text-center mb-2">
+            <div><span class="text-[10px] text-stone-500">字符数</span></div>
+            <div><span id="aChars" class="text-sm font-mono text-stone-200">-</span></div>
+            <div><span id="bChars" class="text-sm font-mono text-stone-200">-</span></div>
+        </div>
+        <div class="grid grid-cols-3 gap-4 text-center mb-2">
+            <div><span class="text-[10px] text-stone-500">估算 Token</span></div>
+            <div><span id="aTokens" class="text-sm font-mono font-bold text-sky-400">-</span></div>
+            <div><span id="bTokens" class="text-sm font-mono font-bold text-amber-400">-</span></div>
+        </div>
+        <div class="grid grid-cols-3 gap-4 text-center mb-2">
+            <div><span class="text-[10px] text-stone-500">关键词密度</span></div>
+            <div><span id="aDensity" class="text-xs font-mono text-stone-200">-</span></div>
+            <div><span id="bDensity" class="text-xs font-mono text-stone-200">-</span></div>
+        </div>
+        <div class="grid grid-cols-3 gap-4 text-center mb-2">
+            <div><span class="text-[10px] text-stone-500">结构完整性</span></div>
+            <div id="aScore" class="text-sm font-bold">-</div>
+            <div id="bScore" class="text-sm font-bold">-</div>
+        </div>
+        <div class="border-t border-stone-700 pt-3 mt-3 text-center">
+            <span id="verdict" class="text-xs"></span>
+        </div>
+    </div>
+</section>
+
+<div class="tool-footer-note max-w-none">
+    <hr class="border-stone-800 my-4">
+    <p class="text-xs text-stone-500 leading-relaxed mb-2">📝 这个工具是因为给同一个任务写了两版Prompt——一版简单粗暴、一版加了角色设定和输出格式约束，结果AI的回答质量天差地别。后来养成习惯：重要Prompt都写两版对比。这个工具没法真接API，但能帮你快速对比Token消耗和结构完整性。</p>
+    <p class="text-xs text-stone-500 leading-relaxed">代码很糙，但能用。如果对你有用，欢迎<a href="../../../support.html" class="text-emerald-400 underline hover:text-emerald-300">请我喝杯咖啡</a>。</p>
+</div>
+
+</main>
+
+<footer class="border-t border-stone-800 bg-stone-950 px-6 py-6">
+    <div class="max-w-5xl mx-auto text-center space-y-2">
+        <p class="text-[11px] text-stone-500">© 2026 laomunong.com All Rights Reserved.</p>
+        <p class="text-[10px] text-stone-600">🛡️ 本工具为纯客户端运行，Prompt绝不离开浏览器。</p>
+        <a href="../../../privacy-policy.html" class="text-[10px] text-stone-500 underline hover:text-emerald-400 transition-colors">隐私政策 / Privacy Policy</a>
+    </div>
+</footer>
+
+<script>
+function countTokens(text) {
+    if (!text) return 0;
+    var tokens = 0;
+    for (var i = 0; i < text.length; i++) {
+        var ch = text[i];
+        if (/[一-鿿]/.test(ch)) tokens += 1.8;
+        else if (/[a-zA-Z0-9]/.test(ch)) tokens += 0.3;
+        else if (/\s/.test(ch)) tokens += 0.1;
+        else tokens += 0.5;
+    }
+    return Math.round(tokens);
+}
+
+function checkStructure(text) {
+    var score = 0;
+    var checks = [];
+    if (text.length > 100) { score += 25; checks.push('足够长度'); }
+    if (/角色|你是|作为|act as/i.test(text)) { score += 20; checks.push('角色设定'); }
+    if (/格式|输出|返回|json|markdown/i.test(text)) { score += 20; checks.push('输出约束'); }
+    if (/步骤|首先|然后|最后|step/i.test(text)) { score += 15; checks.push('分步指令'); }
+    if (/示例|例如|example/i.test(text)) { score += 10; checks.push('示例引导'); }
+    if (/不要|禁止|避免|don\'t|never/i.test(text)) { score += 10; checks.push('负面约束'); }
+    return { score: Math.min(score, 100), checks: checks };
+}
+
+function analyze() {
+    var a = document.getElementById('promptA').value;
+    var b = document.getElementById('promptB').value;
+    if (!a && !b) { document.getElementById('compareResult').classList.add('hidden'); return; }
+
+    document.getElementById('compareResult').classList.remove('hidden');
+    document.getElementById('aChars').textContent = a.length;
+    document.getElementById('bChars').textContent = b.length;
+    document.getElementById('aTokens').textContent = countTokens(a);
+    document.getElementById('bTokens').textContent = countTokens(b);
+
+    var densityA = a ? (a.match(/[a-zA-Z一-鿿]+/g) || []).length + '个词' : '-';
+    var densityB = b ? (b.match(/[a-zA-Z一-鿿]+/g) || []).length + '个词' : '-';
+    document.getElementById('aDensity').textContent = densityA;
+    document.getElementById('bDensity').textContent = densityB;
+
+    var structA = checkStructure(a);
+    var structB = checkStructure(b);
+
+    var colorA = structA.score >= 70 ? 'text-emerald-400' : structA.score >= 40 ? 'text-amber-400' : 'text-red-400';
+    var colorB = structB.score >= 70 ? 'text-emerald-400' : structB.score >= 40 ? 'text-amber-400' : 'text-red-400';
+
+    document.getElementById('aScore').innerHTML = '<span class="'+colorA+'">'+structA.score+'/100</span><br><span class="text-[10px] text-stone-500">'+structA.checks.join(', ')||'基本' + '</span>';
+    document.getElementById('bScore').innerHTML = '<span class="'+colorB+'">'+structB.score+'/100</span><br><span class="text-[10px] text-stone-500">'+structB.checks.join(', ')||'基本' + '</span>';
+
+    var diff = countTokens(a) - countTokens(b);
+    var verdict = document.getElementById('verdict');
+    if (!a || !b) {
+        verdict.innerHTML = '<span class="text-stone-500">输入两个Prompt以查看对比</span>';
+    } else if (diff < -50) {
+        verdict.innerHTML = '<span class="text-amber-400">⚡ A的Token消耗比B多 '+Math.abs(diff)+' 个。考虑精简A。</span>';
+    } else if (diff > 50) {
+        verdict.innerHTML = '<span class="text-amber-400">⚡ B的Token消耗比A多 '+diff+' 个。考虑精简B。</span>';
+    } else {
+        verdict.innerHTML = '<span class="text-emerald-400">✅ 两个Prompt的Token消耗相近（差异 '+Math.abs(diff)+'）。比较结构评分决定优劣。</span>';
+    }
+}
+
+var samples = {
+    a: '帮我写一个Python脚本，从CSV文件读取数据，计算每列的平均值，然后生成一个HTML报告。',
+    b: '你是一位资深数据工程师。请帮我完成以下任务：\n\n1. 从 CSV 文件读取数据（路径: ./data.csv）\n2. 计算每列的统计值（平均值、最大值、最小值）\n3. 生成一个格式化的 HTML 报告\n\n要求：\n- 使用 pandas 库\n- 代码包含完整的错误处理\n- 输出格式为标准的 HTML 表格\n- 在代码中加注释\n\n示例输出格式：\n<table>\n  <tr><td>列名</td><td>平均值</td></tr>\n</table>\n\n不要使用全局变量。'
+};
+
+function loadSample(which) {
+    document.getElementById('prompt'+which.toUpperCase()).value = samples[which];
+    analyze();
+}
+</script>
+</body>
+</html>

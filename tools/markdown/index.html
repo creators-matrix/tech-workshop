@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../../assets/avatar.png">
+    <title>Markdown实时预览编辑器 — 在线写MD边写边看 | laomunong.com</title>
+    <meta name="description" content="纯前端Markdown编辑器。左侧编写右侧实时预览，支持代码高亮、表格、任务列表。数据不上传服务器。">
+    <link rel="canonical" href="https://laomunong.com/tech-workshop/tools/markdown/">
+    <meta property="og:title" content="Markdown实时预览编辑器 | laomunong.com">
+    <meta property="og:description" content="在线Markdown编辑器，实时预览，纯前端。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://laomunong.com/tech-workshop/tools/markdown/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="google-site-verification" content="WBd5ihUqyGU_WVKMVppCAk2anl58qI1BSkAh-lMDjCs">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7499717658670470" crossorigin="anonymous"></script>
+    <style>
+        .md-preview h1 { font-size:1.5em; font-weight:700; margin:0.5em 0; border-bottom:1px solid #374151; padding-bottom:0.3em; }
+        .md-preview h2 { font-size:1.25em; font-weight:700; margin:0.5em 0; }
+        .md-preview h3 { font-size:1.1em; font-weight:600; margin:0.4em 0; }
+        .md-preview code { background:#1f2937; padding:2px 6px; border-radius:4px; font-size:0.85em; color:#10b981; }
+        .md-preview pre { background:#1f2937; padding:12px; border-radius:8px; overflow-x:auto; margin:0.5em 0; }
+        .md-preview pre code { background:none; padding:0; color:#e5e7eb; }
+        .md-preview blockquote { border-left:3px solid #10b981; padding-left:12px; color:#9ca3af; margin:0.5em 0; }
+        .md-preview table { border-collapse:collapse; width:100%; margin:0.5em 0; }
+        .md-preview th, .md-preview td { border:1px solid #374151; padding:6px 10px; text-align:left; font-size:0.9em; }
+        .md-preview th { background:#1f2937; font-weight:600; }
+        .md-preview ul, .md-preview ol { padding-left:1.5em; }
+        .md-preview li { margin:0.2em 0; }
+        .md-preview a { color:#10b981; text-decoration:underline; }
+        .md-preview hr { border:none; border-top:1px solid #374151; margin:1em 0; }
+        .md-preview img { max-width:100%; border-radius:8px; }
+        .md-preview input[type="checkbox"] { margin-right:6px; }
+    </style>
+</head>
+<body class="bg-stone-950 text-stone-200 min-h-screen flex flex-col font-sans">
+
+<header class="border-b border-stone-800 bg-stone-950 px-6 py-5">
+    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+            <div class="text-[11px] text-stone-500 font-mono mb-1">
+                <a href="../../../" class="hover:text-emerald-400 transition-colors">Matrix</a>
+                <span class="text-stone-700"> / </span>
+                <a href="../../" class="hover:text-emerald-400 transition-colors">Tech Workshop</a>
+                <span class="text-stone-700"> / </span>
+                <span class="text-emerald-400">Markdown Editor</span>
+            </div>
+            <h1 class="text-xl font-black text-stone-100 tracking-tight">📝 Markdown <span class="text-emerald-400">实时预览编辑器</span></h1>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="insertMD('**粗体**')" title="粗体" class="text-xs bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700 rounded px-2 py-1 transition">B</button>
+            <button onclick="insertMD('*斜体*')" title="斜体" class="text-xs bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700 rounded px-2 py-1 italic transition">I</button>
+            <button onclick="insertMD('`代码`')" title="代码" class="text-xs bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700 rounded px-2 py-1 font-mono transition">&lt;/&gt;</button>
+            <button onclick="insertMD('\n- [ ] ')" title="任务列表" class="text-xs bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700 rounded px-2 py-1 transition">☑</button>
+            <button onclick="insertMD('\n| 列1 | 列2 |\n| --- | --- |\n| 值 | 值 |')" title="表格" class="text-xs bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700 rounded px-2 py-1 transition">⊞</button>
+            <button onclick="document.getElementById('mdInput').value='';renderMD();" title="清空" class="text-xs border border-stone-700 text-stone-400 hover:text-stone-200 px-2 py-1 rounded transition">✕ 清空</button>
+            <a href="../../" class="text-xs text-stone-500 hover:text-emerald-400 border border-stone-700 rounded-lg px-3 py-1.5 transition-colors shrink-0">← 返回</a>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-5xl mx-auto p-6 flex-grow">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-[70vh]">
+        <div class="flex flex-col">
+            <label class="text-[10px] text-stone-500 mb-1 uppercase tracking-wider">Markdown 源码</label>
+            <textarea id="mdInput" oninput="renderMD()" class="flex-1 bg-stone-900 border border-stone-700 rounded-lg p-4 text-stone-200 text-sm font-mono focus:outline-none focus:border-emerald-500 resize-none" placeholder="# 开始写 Markdown..."></textarea>
+            <div class="text-[10px] text-stone-600 mt-1"><span id="charCount">0</span> 字符 · <span id="wordCount">0</span> 词 · <span id="lineCount">0</span> 行</div>
+        </div>
+        <div class="flex flex-col">
+            <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] text-stone-500 uppercase tracking-wider">实时预览</span>
+                <button onclick="copyHTML()" class="text-[10px] text-stone-500 hover:text-emerald-400 transition">📋 复制HTML</button>
+            </div>
+            <div id="previewArea" class="flex-1 bg-stone-900 border border-stone-700 rounded-lg p-4 overflow-y-auto text-sm text-stone-300 leading-relaxed md-preview">
+                <span class="text-stone-600">预览区域（开始输入...）</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="tool-footer-note max-w-none">
+        <hr class="border-stone-800 my-4">
+        <p class="text-xs text-stone-500 leading-relaxed mb-2">📝 这个工具是因为写项目README——在VSCode里写完了还得push到GitHub才能看到渲染效果，改一个标点就要等。有个浏览器里能实时预览的编辑器，写文档速度快三倍。</p>
+        <p class="text-xs text-stone-500 leading-relaxed">代码很糙，但能用。如果对你有用，欢迎<a href="../../../support.html" class="text-emerald-400 underline hover:text-emerald-300">请我喝杯咖啡</a>。</p>
+    </div>
+</main>
+
+<footer class="border-t border-stone-800 bg-stone-950 px-6 py-6">
+    <div class="max-w-5xl mx-auto text-center space-y-2">
+        <p class="text-[11px] text-stone-500">© 2026 laomunong.com All Rights Reserved.</p>
+        <p class="text-[10px] text-stone-600">🛡️ 本工具为纯客户端运行，内容绝不离开浏览器。</p>
+        <a href="../../../privacy-policy.html" class="text-[10px] text-stone-500 underline hover:text-emerald-400 transition-colors">隐私政策 / Privacy Policy</a>
+    </div>
+</footer>
+
+<script>
+function escapeHTML(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderMD() {
+    var md = document.getElementById('mdInput').value;
+    var html = md
+        // 代码块（优先级最高）
+        .replace(/```(\w*)\n([\s\S]*?)```/g, function(_, lang, code) {
+            return '<pre><code>' + escapeHTML(code.trim()) + '</code></pre>';
+        })
+        // 行内代码
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        // 标题
+        .replace(/^#### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+        // 粗体/斜体
+        .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        // 链接/图片
+        .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+        // 引用
+        .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+        // 分割线
+        .replace(/^(---|\*\*\*|___)$/gm, '<hr>')
+        // 任务列表
+        .replace(/^- \[([ x])\] (.+)$/gm, function(_, check, text) {
+            return '<div><input type="checkbox" '+(check==='x'?'checked':'')+' disabled> '+text+'</div>';
+        })
+        // 无序列表
+        .replace(/^- (.+)$/gm, '<li>$1</li>')
+        // 有序列表
+        .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+        // 表格
+        .replace(/^\|(.+)\|$/gm, function(row) {
+            var cells = row.split('|').filter(function(c) { return c.trim(); });
+            if (/^[-: ]+$/.test(cells.join(''))) return '<!--header-sep-->';
+            var isHeader = row.indexOf('---') === -1;
+            return '<tr>' + cells.map(function(c) { return (isHeader ? '<th>' : '<td>') + c.trim() + (isHeader ? '</th>' : '</td>'); }).join('') + '</tr>';
+        })
+        // 段落
+        .replace(/^(?!<[a-z]|<!--)(.+)$/gm, '<p>$1</p>')
+        // 修复表格
+        .replace(/(<tr>[\s\S]*?<\/tr>)\s*<!--header-sep-->\s*(<tr>[\s\S]*?<\/tr>)/g, '<table><thead>$1</thead><tbody>$2</tbody></table>')
+        .replace(/(<table>[\s\S]*?<\/tbody><\/table>)/, function(m) { return m; })
+        // 修复连续表格行（未包裹的情况）
+        .replace(/(<tr>[\s\S]*?<\/tr>)\s*(<tr>[\s\S]*?<\/tr>)/g, function(_, a, b) {
+            if (a.match(/<th>/) && !b.match(/<th>/)) return '<table><thead>'+a+'</thead><tbody>'+b+'</tbody></table>';
+            return _;
+        })
+        // 换行
+        .replace(/\n\n/g, '<br><br>');
+
+    document.getElementById('previewArea').innerHTML = html || '<span class="text-stone-600">预览区域</span>';
+    document.getElementById('charCount').textContent = md.length;
+    document.getElementById('wordCount').textContent = (md.match(/[a-zA-Z一-鿿]+/g) || []).length;
+    document.getElementById('lineCount').textContent = md.split('\n').length;
+}
+
+function insertMD(text) {
+    var ta = document.getElementById('mdInput');
+    var start = ta.selectionStart, end = ta.selectionEnd;
+    ta.value = ta.value.substring(0, start) + text + ta.value.substring(end);
+    ta.focus();
+    ta.setSelectionRange(start + text.length, start + text.length);
+    renderMD();
+}
+
+function copyHTML() {
+    var html = document.getElementById('previewArea').innerHTML;
+    navigator.clipboard.writeText(html).then(function() {
+        alert('HTML已复制到剪贴板');
+    });
+}
+</script>
+</body>
+</html>
