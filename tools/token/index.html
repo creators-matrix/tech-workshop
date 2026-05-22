@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线 AI Token 计数器与费用估算工具 - 纯前端免登录安全版 - 老码农技术工坊</title>
+    <meta name="description" content="提供纯前端安全的 GPT-4o、Claude 3.5、DeepSeek Token 数量在线计算与 API 价格费用估算。数据绝不上传，保护隐私代码资产。">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-stone-50 text-stone-800 min-h-screen p-4 md:p-8">
+    <div class="max-w-4xl mx-auto bg-white border border-stone-200 shadow-sm rounded-2xl p-6">
+        <div class="border-b border-stone-100 pb-4 mb-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-stone-900 flex items-center gap-2"><span>📊</span> AI Token 计数器与费用精确估算</h1>
+                <p class="text-sm text-stone-500 mt-1">本地纯前端计算，您的文本绝不上传服务器，100% 保护商业代码与 Prompt 隐私。</p>
+            </div>
+            <a href="../../index.html" class="text-xs text-stone-500 hover:text-emerald-600 border px-3 py-1.5 rounded-lg bg-white shadow-sm">返回箱首页 ↩</a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="md:col-span-2 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-2">选择 AI 模型架构</label>
+                    <select id="modelSelect" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-4 py-3 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="deepseek" data-in="0.14" data-out="0.28">DeepSeek-V3 / R1 (输入 $0.14/M, 输出 $0.28/M 💰推荐)</option>
+                        <option value="gpt4o" data-in="2.50" data-out="10.00">GPT-4o (输入 $2.50/M, 输出 $10.00/M)</option>
+                        <option value="claude35" data-in="3.00" data-out="15.00">Claude 3.5 Sonnet (输入 $3.00/M, 输出 $15.00/M)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-2">粘贴您的 Prompt 或文本内容</label>
+                    <textarea id="inputText" rows="10" class="w-full bg-stone-50 border border-stone-300 rounded-xl p-4 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="在此粘贴您的中英文文本或代码..."></textarea>
+                </div>
+            </div>
+
+            <div class="bg-stone-50 border border-stone-200 rounded-xl p-5 flex flex-col justify-between">
+                <div>
+                    <h3 class="font-semibold text-stone-900 border-b pb-2 mb-4">实时计量面板</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-xs text-stone-500 block">字符总数 (含空格)</span>
+                            <span id="charCount" class="text-2xl font-bold font-mono text-stone-800">0</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-stone-500 block">预计消耗 Token 数量</span>
+                            <span id="tokenCount" class="text-3xl font-bold font-mono text-emerald-600">0</span>
+                        </div>
+                        <div class="pt-4 border-t border-stone-200">
+                            <span class="text-xs text-stone-500 block">预估 API 调用成本 (以输入计)</span>
+                            <span id="costEstimate" class="text-2xl font-bold font-mono text-amber-600">$0.000000</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 pt-4 border-t border-stone-200 text-xs text-stone-500 space-y-1">
+                    <p>💾 本地算力告急？👉 <a href="../vram/" class="text-emerald-600 hover:underline">去算算你的显卡能跑多大本地模型</a></p>
+                </div>
+            </div>
+        </div>
+
+        <article class="mt-12 border-t border-stone-200 pt-8 max-w-none text-stone-600 space-y-6">
+            <h2 class="text-xl font-bold text-stone-900">💡 2026年独立开发算力账本：大模型 Token 爆仓与降本点杀实战</h2>
+            
+            <div class="space-y-4 text-sm leading-relaxed">
+                <h3 class="text-base font-bold text-stone-800">1. 什么是 Token？</h3>
+                <p>Token 是大语言模型（LLM）处理文本的最小基本语法单位。大模型在接收到人类语言后，无法直接理解字符串，而是通过分词器（Tokenizer）将文本切碎成一串数字编码。通常情况下，1个英文单词大约等于 1.3 个 Token，而1个复杂的非结构化汉字因为编码切分关系，可能会占用 1 到 2 个 Token。</p>
+
+                <h3 class="text-base font-bold text-stone-800">2. GPT 为什么消耗 Token？为什么 API 这么贵？</h3>
+                <p>大模型本质上是一个巨大的矩阵参数概率预测机。你输入的每一个字（Prompt），都需要与模型数百亿甚至数千亿的参数进行一次全量注意力机制（Attention）矩阵乘法运算。每一次运算都在疯狂消耗数据中心 NVIDIA H100 等算力卡的电力和带宽，因此云端服务商必须严格按照 Token 的吞吐量向独立开发者计费。</p>
+
+                <h3 class="text-base font-bold text-stone-800">3. Claude Token 计算逻辑与全文本解析</h3>
+                <p>Anthropic 旗下的 Claude 3.5 系列模型在处理长文本和复杂的计算机代码时表现极佳。但需要注意的是，Claude 的 Anthropic 分词器在处理非英文字符和 Markdown 标记符号（如代码块）时，Token 计费密度会显著上升。在编写复杂系统提示词时，务必注意精简冗余格式，避免上下文快速膨胀。</p>
+
+                <h3 class="text-base font-bold text-stone-800">4. DeepSeek 极端成本分析与独立开发者省钱指南</h3>
+                <p>DeepSeek 的推出彻底打破了硅谷大模型的垄断，其百万 Token 仅需不到一元人民币的价格，得益于其独特的 Multi-head Latent Attention (MLA) 架构与大规模混合专家模型（MoE）结构。对于创业团队和个人创作者来说，将逻辑节点切分到 DeepSeek，能够将运营算力成本直接斩断 90% 以上。</p>
+                
+                <p class="bg-stone-50 p-4 rounded-xl border border-stone-100">🔥 <b>云端托管平替推荐：</b>如果不想被闭源 API 绑架，建议直接使用开源模型进行私有云托管。点击查看 <a href="https://www.digitalocean.com/" class="text-emerald-600 font-bold underline" target="_blank">DigitalOcean 一键部署专属 Llama 节点（独立开发者专属特惠链接）</a>，用固定的服务器月租，彻底告别按 Token 计费的焦虑。</p>
+            </div>
+        </article>
+    </div>
+
+    <script>
+        const inputText = document.getElementById('inputText');
+        const charCount = document.getElementById('charCount');
+        const tokenCount = document.getElementById('tokenCount');
+        const costEstimate = document.getElementById('costEstimate');
+        const modelSelect = document.getElementById('modelSelect');
+
+        function calculate() {
+            const text = inputText.value;
+            charCount.innerText = text.length;
+            let tokens = 0;
+            for (let i = 0; i < text.length; i++) {
+                tokens += text.charCodeAt(i) <= 127 ? 0.25 : 0.75;
+            }
+            const finalTokens = Math.max(Math.ceil(tokens), 0);
+            tokenCount.innerText = finalTokens;
+
+            const selectedOption = modelSelect.options[modelSelect.selectedIndex];
+            const pricePerMillion = parseFloat(selectedOption.getAttribute('data-in'));
+            costEstimate.innerText = '$' + ((finalTokens / 1000000) * pricePerMillion).toFixed(6);
+        }
+        inputText.addEventListener('input', calculate);
+        modelSelect.addEventListener('change', calculate);
+    </script>
+</body>
+</html>

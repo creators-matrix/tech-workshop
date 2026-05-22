@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI 上下文窗口(Context)计算器与溢出风控工具 - 老码农技术工坊</title>
     <meta name="description" content="在线分析 AI 复杂提示词与多轮历史对话的 Context 窗口占用。提前预警大语言模型爆窗口、记忆断层及 API 费用暴涨风险。">
-    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-stone-50 text-stone-800 min-h-screen p-4 md:p-8">
     <div class="max-w-4xl mx-auto bg-white border border-stone-200 shadow-sm rounded-2xl p-6">
-        <div class="border-b border-stone-100 pb-4 mb-6">
-            <h1 class="text-2xl font-bold text-stone-900 flex items-center gap-2">
-                <span>⚖️</span> LLM 上下文窗口 (Context) 溢出风控计算
-            </h1>
-            <p class="text-sm text-stone-500 mt-1">深度长对话和复杂自动化逻辑（n8n/ComfyUI）的调试利器。精准掌控大模型记忆边界。</p>
+        <div class="border-b border-stone-100 pb-4 mb-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-stone-900 flex items-center gap-2"><span>⚖️</span> LLM 上下文窗口 (Context) 溢出风控计算</h1>
+                <p class="text-sm text-stone-500 mt-1">深度长对话和复杂自动化逻辑（n8n/ComfyUI）的调试利器。精准掌控大模型记忆边界。</p>
+            </div>
+            <a href="../../" class="text-xs text-stone-500 hover:text-emerald-600 border px-3 py-1.5 rounded-lg bg-white shadow-sm">返回箱首页 ↩</a>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -21,7 +22,7 @@
                 <div>
                     <label class="block text-sm font-medium text-stone-700 mb-1">目标大模型硬性上下文窗口上限</label>
                     <select id="maxWindow" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-4 py-2.5 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                        <option value="8192">8K (常见本地小模型 Llama 核心软上限)</option>
+                        <option value="8192">8K (常见本地小模型核心软上限)</option>
                         <option value="32768" selected>32K (DeepSeek / 开源生态工业基础窗口)</option>
                         <option value="131072">128K (GPT-4o / Claude 深度全量窗口)</option>
                     </select>
@@ -49,20 +50,23 @@
                             <div id="progressBar" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
                         </div>
                     </div>
-                    <div id="riskAlert" class="p-3 rounded-lg text-xs font-medium">
-                        🟢 状态：安全。模型能完全消化当前对话。
-                    </div>
-                </div>
-                <div class="mt-4 pt-4 border-t border-stone-200 text-xs text-stone-500">
-                    💡 提示：超出窗口会导致模型彻底遗忘开头的信息。
+                    <div id="riskAlert" class="p-3 rounded-lg text-xs font-medium">🟢 状态：安全。</div>
                 </div>
             </div>
         </div>
 
-        <div class="mt-12 border-t border-stone-200 pt-8 prose max-w-none text-stone-600 text-xs leading-relaxed space-y-4">
-            <h2 class="text-base font-bold text-stone-900">🔬 什么是大模型长上下文溢出风险？</h2>
-            <p>当独立开发者利用 **n8n** 编排自动化管线，或让 AI 进行批量长代码重构时，往往会不断将历史对话累加发送给大模型。大模型能够容纳的最大范围被称为 **Context Window (上下文窗口)**。一旦总计数超过了这个软上限，大模型会采用截断（Sliding Window）或者遭遇注意力机制断崖（Needle in a Haystack 丢失率暴涨），导致模型胡言乱语、记忆丧失，并在无形中让你的 API 费用呈几何倍数暴增。在发送前进行 Context 的前端风控计算，是高级自动化生产线的标准操作。</p>
-        </div>
+        <article class="mt-12 border-t border-stone-200 pt-8 max-w-none text-stone-600 space-y-6 text-sm leading-relaxed">
+            <h2 class="text-xl font-bold text-stone-900">💡 为什么你的 AI 经常“降智”与“失忆”？深度长文本 Context 窗口滑动风控策略</h2>
+            
+            <h3 class="text-base font-bold text-stone-800">1. AI 越聊越笨，不是错觉，是你的窗口爆了！</h3>
+            <p>当独立开发者利用 n8n 编排自动化管线，或让 AI 进行批量长代码重构时，往往会不断将历史对话累加发送给大模型。大模型能够容纳的最大范围被称为 Context Window (上下文窗口)。一旦总计数超过了这个软上限，大模型会采用截断（Sliding Window）或者遭遇注意力机制断崖（丢失率暴涨），导致模型记忆丧失、胡言乱语。</p>
+            
+            <h3 class="text-base font-bold text-stone-800">2. 注意力机制的物理枷锁：Needle in a Haystack（大海捞针）困局</h3>
+            <p>现在的闭源模型和开源模型天天吹嘘自己支持 128K 甚至百万级的超长上下文。工业界最著名的基准测试叫 Needle in a Haystack（大海捞针测试）：把一句核心指令藏在 10 万字文章的中间位置，看模型能不能找出来。实测发现，当 Context 填充度超过 70% 后，大多数模型的准确率会发生断崖式下跌。它不是不想听你的话，而是由于矩阵太长，前面的注意力权重被后面的海量文本给无情稀释了。</p>
+
+            <h3 class="text-base font-bold text-stone-800">3. 老码农的一线“防降智”滑动风控方案</h3>
+            <p>在发送前进行 Context 的前端风控计算，是高级自动化生产线的标准操作。在调用长文本 API 时，不仅要在开头写明规则，最好在 Prompt 的最末尾重新用标记重复一遍核心约束。同时，在自动化流中，每隔 5 轮对话，加入一个低成本的 DeepSeek-V3 节点，把前面的对话压缩成摘要并清空历史消息，永远把 Context 压制在 10% 的安全水位。</p>
+        </article>
     </div>
 
     <script>
@@ -70,39 +74,30 @@
             const maxW = parseInt(document.getElementById('maxWindow').value);
             const sysT = document.getElementById('sysPrompt').value;
             const hisT = document.getElementById('historyPrompt').value;
-
-            // 基础字数到 token 粗估
             let totalLen = sysT.length + hisT.length;
             let estTokens = 0;
             for(let i=0; i<totalLen; i++){
-                estTokens += (text = sysT+hisT).charCodeAt(i) <= 127 ? 0.25 : 0.75;
+                estTokens += (sysT+hisT).charCodeAt(i) <= 127 ? 0.25 : 0.75;
             }
             estTokens = Math.ceil(estTokens);
-
             document.getElementById('totalContext').innerText = estTokens + " / " + maxW;
 
-            // 进度条与风险判定
             let percent = Math.min((estTokens / maxW) * 100, 100);
             const pBar = document.getElementById('progressBar');
             const alertBox = document.getElementById('riskAlert');
-
             pBar.style.width = percent + "%";
 
             if (percent < 60) {
                 pBar.className = "bg-emerald-500 h-full transition-all duration-300";
-                alertBox.className = "p-3 bg-emerald-50 text-emerald-800 rounded-lg text-xs font-medium";
-                alertBox.innerText = "🟢 状态：安全。模型能完美建立全量注意力机制，记忆极其精准。";
+                alertBox.innerText = "🟢 状态：安全。模型能完全消化当前对话。";
             } else if (percent < 85) {
                 pBar.className = "bg-amber-500 h-full transition-all duration-300";
-                alertBox.className = "p-3 bg-amber-50 text-amber-800 rounded-lg text-xs font-medium";
-                alertBox.innerText = "🟡 预警：窗口水位偏高。模型推理速度可能会出现小幅下滑，注意精简无用多轮对话。";
+                alertBox.innerText = "🟡 预警：窗口水位偏高。注意精简无用多轮对话。";
             } else {
                 pBar.className = "bg-rose-500 h-full transition-all duration-300";
-                alertBox.className = "p-3 bg-rose-50 text-rose-800 rounded-lg text-xs font-medium border border-rose-200 animate-pulse";
-                alertBox.innerText = "🔴 极高风险：即将或已经突破硬性窗口上限！模型将遭遇灾难性遗忘，API 费用开销极易失控崩溃！";
+                alertBox.innerText = "🔴 极高风险：即将或已经突破硬性窗口上限！模型将遭遇灾难性遗忘。";
             }
         }
-
         document.getElementById('maxWindow').addEventListener('change', checkContext);
         document.getElementById('sysPrompt').addEventListener('input', checkContext);
         document.getElementById('historyPrompt').addEventListener('input', checkContext);
