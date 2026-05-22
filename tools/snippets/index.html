@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../../assets/avatar.png">
+    <title>代码片段收藏夹 — 纯前端localStorage存储 | laomunong.com</title>
+    <meta name="description" content="纯前端代码片段管理器。保存常用代码、搜索过滤、一键复制。所有数据存储在浏览器localStorage，无需登录。">
+    <link rel="canonical" href="https://laomunong.com/tech-workshop/tools/snippets/">
+    <meta property="og:title" content="代码片段收藏夹 | laomunong.com">
+    <meta property="og:description" content="保存代码片段到浏览器，纯前端localStorage，无需登录。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://laomunong.com/tech-workshop/tools/snippets/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="google-site-verification" content="WBd5ihUqyGU_WVKMVppCAk2anl58qI1BSkAh-lMDjCs">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7499717658670470" crossorigin="anonymous"></script>
+</head>
+<body class="bg-stone-950 text-stone-200 min-h-screen flex flex-col font-sans">
+
+<header class="border-b border-stone-800 bg-stone-950 px-6 py-5">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+            <div class="text-[11px] text-stone-500 font-mono mb-1">
+                <a href="../../../" class="hover:text-emerald-400 transition-colors">Matrix</a>
+                <span class="text-stone-700"> / </span>
+                <a href="../../" class="hover:text-emerald-400 transition-colors">Tech Workshop</a>
+                <span class="text-stone-700"> / </span>
+                <span class="text-emerald-400">Snippets</span>
+            </div>
+            <h1 class="text-xl font-black text-stone-100 tracking-tight">📋 代码片段 <span class="text-emerald-400">收藏夹</span></h1>
+        </div>
+        <div class="flex gap-2">
+            <span id="snippetCount" class="text-[10px] text-stone-500 self-center">0 条</span>
+            <button onclick="showAddForm()" class="bg-emerald-600 hover:bg-emerald-500 text-black font-bold px-4 py-2 rounded text-xs tracking-wider transition">+ 新增</button>
+            <a href="../../" class="text-xs text-stone-500 hover:text-emerald-400 border border-stone-700 rounded-lg px-3 py-1.5 transition-colors shrink-0">← 返回</a>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-4xl mx-auto p-6 flex-grow">
+
+<!-- 搜索 -->
+<div class="flex gap-2 mb-4">
+    <input type="text" id="searchInput" oninput="renderList()" placeholder="搜索片段..." class="flex-1 bg-stone-900 border border-stone-700 rounded-lg px-3 py-2 text-stone-200 text-sm focus:outline-none focus:border-emerald-500">
+    <select id="langFilter" onchange="renderList()" class="bg-stone-900 border border-stone-700 rounded-lg px-3 py-2 text-stone-200 text-sm focus:outline-none focus:border-emerald-500">
+        <option value="">全部语言</option>
+    </select>
+</div>
+
+<!-- 添加/编辑表单 -->
+<div id="editForm" class="hidden bg-stone-900 border border-stone-700 rounded-xl p-5 mb-4">
+    <h3 class="text-sm text-emerald-400 font-bold mb-3"><span id="formTitle">新增片段</span></h3>
+    <input type="hidden" id="editId">
+    <div class="grid grid-cols-2 gap-3 mb-3">
+        <input type="text" id="editTitle" placeholder="片段标题" class="bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-stone-200 text-sm focus:outline-none focus:border-emerald-500">
+        <input type="text" id="editLang" placeholder="语言 (如 JavaScript, Python)" class="bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-stone-200 text-sm focus:outline-none focus:border-emerald-500" list="langSuggest">
+        <datalist id="langSuggest">
+            <option>JavaScript</option><option>Python</option><option>Bash</option><option>SQL</option><option>CSS</option><option>HTML</option><option>JSON</option><option>正则表达式</option>
+        </datalist>
+    </div>
+    <textarea id="editCode" rows="8" placeholder="粘贴代码..." class="w-full bg-stone-800 border border-stone-700 rounded-lg p-3 text-stone-200 text-sm font-mono focus:outline-none focus:border-emerald-500 resize-none mb-3"></textarea>
+    <div class="flex gap-2">
+        <button onclick="saveSnippet()" class="bg-emerald-600 hover:bg-emerald-500 text-black font-bold px-5 py-2 rounded text-xs tracking-wider transition">保存</button>
+        <button onclick="hideForm()" class="border border-stone-700 text-stone-400 hover:text-stone-200 px-4 py-2 rounded text-xs transition">取消</button>
+    </div>
+</div>
+
+<!-- 列表 -->
+<div id="snippetList" class="space-y-3"></div>
+
+<div id="emptyState" class="text-center py-12 border border-dashed border-stone-800 rounded-xl">
+    <p class="text-stone-600 text-sm mb-2">📋 还没有收藏任何代码片段</p>
+    <p class="text-stone-600 text-xs">所有数据存储在浏览器 localStorage 中，无需登录，不会上传</p>
+</div>
+
+<div class="tool-footer-note max-w-none">
+    <hr class="border-stone-800 my-4">
+    <p class="text-xs text-stone-500 leading-relaxed mb-2">📝 这个工具是因为我经常在不同的会话里重复写同样的代码——每次重新搜索之前写过的脚本太浪费时间。用它把常用的正则、curl命令、SQL查询存起来，需要时一键复制。</p>
+    <p class="text-xs text-stone-500 leading-relaxed">代码很糙，但能用。如果对你有用，欢迎<a href="../../../support.html" class="text-emerald-400 underline hover:text-emerald-300">请我喝杯咖啡</a>。<span class="text-[10px] text-stone-600 ml-4">· 🔢 使用 <span class="tool-use-count text-stone-500">-</span> 次</span><script>(function(){var k="lum_"+location.pathname.replace(/\/$/,"").split("/").pop();var c=parseInt(localStorage.getItem(k)||"0")+1;localStorage.setItem(k,c);var els=document.getElementsByClassName("tool-use-count");for(var i=0;i<els.length;i++)els[i].textContent=c;})();</script></p>
+</div>
+
+</main>
+
+<footer class="border-t border-stone-800 bg-stone-950 px-6 py-6">
+    <div class="max-w-4xl mx-auto text-center space-y-2">
+        <p class="text-[11px] text-stone-500">© 2026 laomunong.com All Rights Reserved.</p>
+        <p class="text-[10px] text-stone-600">🛡️ 所有数据存储在浏览器本地 localStorage，绝不离开你的设备。</p>
+        <a href="../../../privacy-policy.html" class="text-[10px] text-stone-500 underline hover:text-emerald-400 transition-colors">隐私政策 / Privacy Policy</a>
+    </div>
+</footer>
+
+<script>
+var STORAGE_KEY = 'laomunong_snippets';
+
+function getSnippets() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch(e) { return []; }
+}
+
+function saveSnippets(data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function showAddForm() {
+    document.getElementById('editForm').classList.remove('hidden');
+    document.getElementById('formTitle').textContent = '新增片段';
+    document.getElementById('editId').value = '';
+    document.getElementById('editTitle').value = '';
+    document.getElementById('editLang').value = '';
+    document.getElementById('editCode').value = '';
+    document.getElementById('editTitle').focus();
+}
+
+function hideForm() {
+    document.getElementById('editForm').classList.add('hidden');
+}
+
+function editSnippet(id) {
+    var snippets = getSnippets();
+    var s = snippets.find(function(x) { return x.id === id; });
+    if (!s) return;
+    document.getElementById('editForm').classList.remove('hidden');
+    document.getElementById('formTitle').textContent = '编辑片段';
+    document.getElementById('editId').value = s.id;
+    document.getElementById('editTitle').value = s.title;
+    document.getElementById('editLang').value = s.lang;
+    document.getElementById('editCode').value = s.code;
+}
+
+function saveSnippet() {
+    var id = document.getElementById('editId').value;
+    var title = document.getElementById('editTitle').value.trim();
+    var lang = document.getElementById('editLang').value.trim();
+    var code = document.getElementById('editCode').value;
+
+    if (!title || !code) { alert('标题和代码不能为空'); return; }
+
+    var snippets = getSnippets();
+
+    if (id) {
+        snippets = snippets.map(function(s) {
+            return s.id === id ? { id:id, title:title, lang:lang, code:code, ts:Date.now() } : s;
+        });
+    } else {
+        snippets.unshift({ id: Date.now().toString(36)+Math.random().toString(36).substr(2,5), title:title, lang:lang, code:code, ts:Date.now() });
+    }
+
+    saveSnippets(snippets);
+    hideForm();
+    renderList();
+}
+
+function deleteSnippet(id) {
+    if (!confirm('确定删除这个片段？')) return;
+    var snippets = getSnippets().filter(function(s) { return s.id !== id; });
+    saveSnippets(snippets);
+    renderList();
+}
+
+function copySnippet(code) {
+    navigator.clipboard.writeText(code).then(function() {
+        // 临时反馈
+    });
+}
+
+function renderList() {
+    var snippets = getSnippets();
+    var query = (document.getElementById('searchInput').value || '').toLowerCase();
+    var lang = document.getElementById('langFilter').value;
+
+    if (query) snippets = snippets.filter(function(s) { return s.title.toLowerCase().indexOf(query)!==-1 || s.code.toLowerCase().indexOf(query)!==-1; });
+    if (lang) snippets = snippets.filter(function(s) { return s.lang === lang; });
+
+    // 更新语言过滤器
+    var allLangs = [];
+    getSnippets().forEach(function(s) { if (s.lang && allLangs.indexOf(s.lang)===-1) allLangs.push(s.lang); });
+    var filter = document.getElementById('langFilter');
+    var currVal = filter.value;
+    filter.innerHTML = '<option value="">全部语言</option>' + allLangs.map(function(l) { return '<option value="'+l+'">'+l+'</option>'; }).join('');
+    filter.value = currVal;
+
+    document.getElementById('snippetCount').textContent = snippets.length + ' 条';
+
+    if (snippets.length === 0) {
+        document.getElementById('snippetList').innerHTML = '';
+        document.getElementById('emptyState').classList.remove('hidden');
+        return;
+    }
+
+    document.getElementById('emptyState').classList.add('hidden');
+    var html = '';
+    snippets.forEach(function(s) {
+        var lines = s.code.split('\n').length;
+        var date = new Date(s.ts).toLocaleDateString('zh-CN');
+        html += '<div class="bg-stone-900 border border-stone-700 rounded-xl p-4 group">'+
+            '<div class="flex items-start justify-between mb-2">'+
+                '<div>'+
+                    '<h3 class="text-sm font-bold text-stone-100">'+esc(s.title)+'</h3>'+
+                    '<div class="flex gap-2 mt-1">'+
+                        (s.lang ? '<span class="text-[10px] bg-stone-800 text-emerald-400 border border-emerald-900 px-1.5 py-0.5 rounded font-mono">'+esc(s.lang)+'</span>' : '')+
+                        '<span class="text-[10px] text-stone-500">'+lines+' 行 · '+date+'</span>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="flex gap-1 shrink-0">'+
+                    '<button onclick="var s=getSnippets().find(function(x){return x.id===\''+s.id+'\'});if(s){navigator.clipboard.writeText(s.code)};this.textContent=\'✅\';var b=this;setTimeout(function(){b.textContent=\'📋\'},1000)" class="text-[10px] text-stone-500 hover:text-emerald-400 border border-stone-700 rounded px-2 py-1 transition">📋</button>'+
+                    '<button onclick="editSnippet(\''+s.id+'\')" class="text-[10px] text-stone-500 hover:text-amber-400 border border-stone-700 rounded px-2 py-1 transition">✏️</button>'+
+                    '<button onclick="deleteSnippet(\''+s.id+'\')" class="text-[10px] text-stone-500 hover:text-red-400 border border-stone-700 rounded px-2 py-1 transition">🗑</button>'+
+                '</div>'+
+            '</div>'+
+            '<pre class="bg-stone-800 rounded-lg p-3 overflow-x-auto text-xs font-mono text-stone-300">'+esc(s.code)+'</pre>'+
+            '</div>';
+    });
+    document.getElementById('snippetList').innerHTML = html;
+}
+
+function esc(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+renderList();
+</script>
+</body>
+</html>
