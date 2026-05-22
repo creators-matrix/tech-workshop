@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM 本地部署显存(VRAM)精密计算器 - 4090/Mac M1 Max 实测 - 老码农技术工坊</title>
+    <meta name="description" content="专业针对显卡(RTX 4090, 3090)及 Apple Silicon Mac 统一内存的本地大模型部署显存占用计算器。一键预估 7B, 14B, 32B, 70B 模型的 GGUF/GPTQ 量化显存开销。">
+    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+</head>
+<body class="bg-stone-50 text-stone-800 min-h-screen p-4 md:p-8">
+    <div class="max-w-4xl mx-auto bg-white border border-stone-200 shadow-sm rounded-2xl p-6">
+        <div class="border-b border-stone-100 pb-4 mb-6">
+            <h1 class="text-2xl font-bold text-stone-900 flex items-center gap-2">
+                <span>🖥️</span> LLM 本地部署显存 (VRAM) 精密计算器
+            </h1>
+            <p class="text-sm text-stone-500 mt-1">本地部署 AI 别再靠盲猜！精准规避 Out of Memory (OOM) 崩溃，独立创作者硬件选型刚需。</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="md:col-span-2 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1">1. 模型原生参数大小 (Billion)</label>
+                    <input type="number" id="paramSize" value="7" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-4 py-2.5 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <div class="flex gap-2 mt-1.5">
+                        <button onclick="document.getElementById('paramSize').value=7;calcVRAM();" class="text-xs bg-stone-100 text-stone-600 px-2 py-1 rounded">7B (Qwen2.5)</button>
+                        <button onclick="document.getElementById('paramSize').value=14;calcVRAM();" class="text-xs bg-stone-100 text-stone-600 px-2 py-1 rounded">14B</button>
+                        <button onclick="document.getElementById('paramSize').value=32;calcVRAM();" class="text-xs bg-stone-100 text-stone-600 px-2 py-1 rounded">32B</button>
+                        <button onclick="document.getElementById('paramSize').value=70;calcVRAM();" class="text-xs bg-stone-100 text-stone-600 px-2 py-1 rounded">70B (Llama3)</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1">2. 量化精度格式 (Quantization)</label>
+                    <select id="quantBit" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-4 py-2.5 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="16">FP16 / BF16 (未量化 - 16位原生精度)</option>
+                        <option value="8">INT8 (高保真量化 - 8位)</option>
+                        <option value="4" selected>Q4_K_M / INT4 (极客主流推荐 - 4位)</option>
+                        <option value="3">Q3_K_L (极限压榨显存 - 3位)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1">3. 预测 Context 上下文长度</label>
+                    <select id="contextSize" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-4 py-2.5 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="4096">4K (基础日常对话)</option>
+                        <option value="8192" selected>8K (长文本/代码编写)</option>
+                        <option value="32768">32K (深度自动化管线吞吐)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="bg-stone-50 border border-stone-200 rounded-xl p-5 flex flex-col justify-between">
+                <div>
+                    <h3 class="font-semibold text-stone-900 border-b pb-2 mb-4">显存算力预估</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-xs text-stone-500 block">预估所需最小物理显存</span>
+                            <span id="vramResult" class="text-3xl font-bold font-mono text-emerald-600">0.00 GB</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-stone-500 block">推荐部署硬件方案</span>
+                            <div id="hardwareRec" class="text-sm font-medium text-stone-800 mt-1 bg-white border p-3 rounded-lg shadow-inner">--</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 text-xs text-stone-400">⚠️ 注：计算包含 20% 的 CUDA 核心系统底噪与基础 KV Cache 开销余量。</div>
+            </div>
+        </div>
+
+        <div class="mt-12 border-t border-stone-200 pt-8 prose max-w-none text-stone-600 text-xs leading-relaxed space-y-6">
+            <h2 class="text-base font-bold text-stone-900">🔥 本地大模型部署显存常见搜索痛点解答</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-3 bg-stone-50 rounded-lg">
+                    <h4 class="font-bold text-stone-800 mb-1">❓ 7B / 14B 模型到底需要多少显存？</h4>
+                    <p>对于主流的 7B（如 Qwen2.5-7B）模型，如果采用未量化的 FP16 原生精度，光是加载模型本体就需要 $7 \times 2 = 14\text{GB}$ 显存。如果加上操作系统和 4K 上下文，16G 显存的显卡必然爆掉。但只要使用 **llama.cpp** 对其进行 4位量化（Q4_K_M），模型体积会瞬间暴跌到约 4.8GB，一张老旧的 8G 显存显卡就能完美流畅运行。</p>
+                </div>
+                <div class="p-3 bg-stone-50 rounded-lg">
+                    <h4 class="font-bold text-stone-800 mb-1">❓ 单张消费级神卡 RTX 4090 能跑 DeepSeek 吗？</h4>
+                    <p>单张消费级旗舰 RTX 4090 拥有 24GB 的物理显存。它能够完美满血跑通 **DeepSeek-V3-Distill-Qwen-14B** 或者是 **32B 的高精量化版本**。但如果你想在本地挑战 671B 的 DeepSeek-R1 满血原版，24G 显存犹如杯水车薪，你需要通过 Mac M1/M4 Max 的 64G/128G 统一内存进行全量加载，或者直接通过营销云算力平台一键托管。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calcVRAM() {
+            const P = parseFloat(document.getElementById('paramSize').value) || 0;
+            const B = parseFloat(document.getElementById('quantBit').value);
+            const C = parseFloat(document.getElementById('contextSize').value);
+
+            // 基础权重大小
+            let modelVRAM = (P * B) / 8;
+            // KV Cache 与底噪估算 (包含上下文)
+            let kvVRAM = (P * C * 2) / 1000000; 
+            let totalVRAM = (modelVRAM + kvVRAM) * 1.2; // 1.2 为系统及算力库冗余系数
+
+            document.getElementById('vramResult').innerText = totalVRAM.toFixed(2) + " GB";
+
+            // 推荐硬件流
+            let rec = "";
+            if (totalVRAM <= 6) {
+                rec = "💻 极低门槛：普通家用笔记本 (显存≥6G) 或 独立显卡 GTX 1660Ti / RTX 3050 即可流畅带玩。";
+            } else if (totalVRAM <= 12) {
+                rec = "🎮 甜品级显卡：RTX 3060 12G / RTX 4070 12G 完美平替，性价比最高的本地个人 AI 调试方案。";
+            } else if (totalVRAM <= 22) {
+                rec = "🔥 消费级旗舰：单张 **RTX 3090 / RTX 4090 24G**。能完美跑通所有 14B 和 32B 量化模型。";
+            } else if (totalVRAM <= 60) {
+                rec = "🍏 极客生产力推荐：**Apple Silicon Mac M1/M2/M3 Max (64GB 统一内存版)**，大模型本地开发降维打击的退路。";
+            } else {
+                rec = "🚀 工业级渲染 / 云端集群：本地消费级硬件已无法承载。强烈推荐一键部署至 <a href='#' class='text-emerald-600 font-bold underline'>RunPod 算力云端</a> 获取多卡 H100 支持。";
+            }
+            document.getElementById('hardwareRec').innerHTML = rec;
+        }
+
+        document.getElementById('paramSize').addEventListener('input', calcVRAM);
+        document.getElementById('quantBit').addEventListener('change', calcVRAM);
+        document.getElementById('contextSize').addEventListener('change', calcVRAM);
+        window.onload = calcVRAM;
+    </script>
+</body>
+</html>

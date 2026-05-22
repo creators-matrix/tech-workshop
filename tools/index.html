@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>独立开发者与自媒体极客工具箱 - 免登录安全静态版 - 老码农技术工坊</title>
+    <meta name="description" content="专为独立开发者、自媒体创作者及AI研究者打造的硬核工具箱。包含 Token 成本估算、显存 VRAM 计算、长文本 Context 风险预警等。纯前端运行，100% 保护隐私。">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-stone-50 text-stone-800 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <header class="border-b border-stone-200 pb-6 mb-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-3xl font-black text-stone-900 tracking-tight flex items-center gap-2">
+                    <span>🛠️</span> CREATORS MATRIX <span class="text-xs bg-emerald-600 text-white font-mono px-2 py-0.5 rounded-full uppercase tracking-widest">Tools</span>
+                </h1>
+                <p class="text-sm text-stone-500 mt-1.5">老码农的技术工坊：拒绝弹窗、免注册登录、数据不上传服务器的纯静态高效生产力阵地。</p>
+            </div>
+            <a href="/" class="text-xs font-medium text-stone-500 hover:text-emerald-600 border border-stone-300 rounded-xl px-4 py-2 bg-white shadow-sm transition">返回中央大门 →</a>
+        </header>
+
+        <main id="toolsContainer" class="space-y-12">
+            </main>
+
+        <footer class="mt-20 border-t border-stone-200 pt-8 text-center text-xs text-stone-400 space-y-2">
+            <p>© 2026 laomunong.com All Rights Reserved. Matrix Workshop Engine.</p>
+            <p>本站所有工具均基于 WebAssembly / HTML5 本地沙箱技术构建，您的任何商业机密文本、代码、Prompt 均在浏览器本地闭环处理，绝不上传，请放心使用。</p>
+        </footer>
+    </div>
+
+    <script>
+        // 1. 这里是你的全量工具数据库。未来有了新工具，直接复制一行加在下面！
+        const toolsData = [
+            {
+                title: "Token 计数与费用精确估算",
+                desc: "实时计算中英文及代码的 Token 消耗，支持 GPT-4o、Claude 3.5 及 DeepSeek 最新官方 API 刀位价格模型，防止账单超支。",
+                path: "./token/",
+                icon: "📊",
+                category: "AI 算力与成本控制"
+            },
+            {
+                title: "LLM 本地部署显存 (VRAM) 计算器",
+                desc: "针对 RTX 4090、3090 及 Mac M1-M4 Max 统一内存的精密模型加载预估，一键避坑 GGUF/INT4 量化 OOM 内存崩溃。",
+                path: "./vram/",
+                icon: "🖥️",
+                category: "AI 算力与成本控制"
+            },
+            {
+                title: "Context 上下文溢出与风控预警",
+                desc: "深度分析长对话、复杂系统提示词（System Prompt）以及历史消息堆叠的窗口占用，提前封堵 AI 记忆断层与降智风险。",
+                path: "./context/",
+                icon: "⚖️",
+                category: "AI 算力与成本控制"
+            }
+            /* 💡 未来新增工具预留位示例（取消注释即可上线）：
+            ,{
+                title: "Docker Edge-TTS 语音节点一键生成器",
+                desc: "输入文案，快速预览并导出自媒体高保真配音，附带 Docker 镜像一键部署命令。",
+                path: "./edge-tts-ui/",
+                icon: "🎙️",
+                category: "自媒体与视频管线"
+            }
+            */
+        ];
+
+        // 2. 自动化渲染引擎（老码农纯前端极简流）
+        function renderTools() {
+            const container = document.getElementById('toolsContainer');
+            
+            // 按分类归纳工具
+            const categories = {};
+            toolsData.forEach(tool => {
+                if (!categories[tool.category]) {
+                    categories[tool.category] = [];
+                }
+                categories[tool.category].push(tool);
+            });
+
+            // 循环吐出 HTML 结构
+            let htmlHTML = "";
+            for (const catName in categories) {
+                htmlHTML += `
+                    <section class="space-y-4">
+                        <h2 class="text-lg font-bold text-stone-900 flex items-center gap-2 border-l-4 border-emerald-600 pl-2.5">
+                            ${catName} <span class="text-xs font-mono font-normal text-stone-400">(${categories[catName].length})</span>
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            ${categories[catName].map(tool => `
+                                <a href="${tool.path}" class="group bg-white border border-stone-200 hover:border-emerald-500 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                                    <div>
+                                        <div class="text-2xl mb-3 group-hover:scale-110 transition-transform duration-200 inline-block">${tool.icon}</div>
+                                        <h3 class="font-bold text-stone-900 group-hover:text-emerald-600 transition-colors">${tool.title}</h3>
+                                        <p class="text-xs text-stone-500 mt-2 leading-relaxed">${tool.desc}</p>
+                                    </div>
+                                    <div class="text-xs font-semibold text-emerald-600 mt-4 flex items-center gap-1 opacity-80 group-hover:opacity-100">
+                                        立即使用 <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+                                    </div>
+                                </a>
+                            `).join('')}
+                        </div>
+                    </section>
+                `;
+            }
+            container.innerHTML = htmlHTML;
+        }
+
+        // 开机即跑
+        window.onload = renderTools;
+    </script>
+</body>
+</html>
