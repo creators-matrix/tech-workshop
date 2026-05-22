@@ -59,7 +59,11 @@
 var toolsData = [
     { name:'Token 成本估算器', desc:'精准计算 GPT-4/Claude API Token 消耗与成本预估。支持多模型对比，实时汇率换算。', icon:'🔤', tags:['Token','API成本'], href:'./tools/token/' },
     { name:'VRAM 显存计算器', desc:'基于模型参数量、精度、批处理大小，精确估算 GPU 显存占用。本地部署必用。', icon:'💾', tags:['VRAM','GPU'], href:'./tools/vram/' },
-    { name:'Context 风控计算器', desc:'评估长文本上下文窗口使用率与截断风险。避免 API 调用中的隐形上下文溢出。', icon:'📐', tags:['Context','风控'], href:'./tools/context/' }
+    { name:'Context 风控计算器', desc:'评估长文本上下文窗口使用率与截断风险。避免 API 调用中的隐形上下文溢出。', icon:'📐', tags:['Context','风控'], href:'./tools/context/' },
+    { name:'JSON 格式化校验器', desc:'粘贴JSON一键格式化或压缩，语法错误精准定位。开发者高频刚需。', icon:'{ }', tags:['JSON','格式化'], href:'./tools/json/' },
+    { name:'Base64 编解码工具', desc:'文本/图片Base64互转，图片文件直接拖入编码。浏览器原生支持，不上传服务器。', icon:'🔐', tags:['Base64','编码'], href:'./tools/base64/' },
+    { name:'Unix时间戳转换', desc:'秒级/毫秒级时间戳与日期互转，实时显示当前时间戳。API对接调试必备。', icon:'⏱️', tags:['时间戳','日期'], href:'./tools/timestamp/' },
+    { name:'正则表达式测试器', desc:'输入正则和测试文本，实时高亮匹配结果，显示捕获组。告别盲调正则。', icon:'.*', tags:['正则','调试'], href:'./tools/regex/' }
 ];
 
 function createToolCard(t) {

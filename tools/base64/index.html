@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../../../assets/avatar.png">
+    <title>Base64编解码工具 — 文本/图片Base64在线互转 | laomunong.com</title>
+    <meta name="description" content="纯前端Base64编解码工具。支持文本↔Base64互转、图片文件→Base64编码。数据不上传服务器，100%本地处理。">
+    <link rel="canonical" href="https://laomunong.com/tech-workshop/tools/base64/">
+    <meta property="og:title" content="Base64编解码工具 | laomunong.com">
+    <meta property="og:description" content="在线Base64编解码，支持文本和图片，纯前端，数据安全。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://laomunong.com/tech-workshop/tools/base64/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="google-site-verification" content="WBd5ihUqyGU_WVKMVppCAk2anl58qI1BSkAh-lMDjCs">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7499717658670470" crossorigin="anonymous"></script>
+</head>
+<body class="bg-stone-950 text-stone-200 min-h-screen flex flex-col font-sans">
+
+<header class="border-b border-stone-800 bg-stone-950 px-6 py-5">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+            <div class="text-[11px] text-stone-500 font-mono mb-1">
+                <a href="../../../" class="hover:text-emerald-400 transition-colors">Matrix</a>
+                <span class="text-stone-700"> / </span>
+                <a href="../../" class="hover:text-emerald-400 transition-colors">Tech Workshop</a>
+                <span class="text-stone-700"> / </span>
+                <span class="text-emerald-400">Base64 Codec</span>
+            </div>
+            <h1 class="text-xl font-black text-stone-100 tracking-tight">🔐 Base64 <span class="text-emerald-400">编解码工具</span></h1>
+        </div>
+        <a href="../../" class="text-xs text-stone-500 hover:text-emerald-400 border border-stone-700 rounded-lg px-3 py-1.5 transition-colors shrink-0">← 返回工坊</a>
+    </div>
+</header>
+
+<main class="max-w-4xl mx-auto p-6 flex-grow">
+
+<section class="bg-stone-900 border border-stone-700 rounded-xl p-6 mb-6">
+    <h2 class="text-sm text-stone-400 uppercase tracking-widest border-b border-stone-800 pb-2 mb-4">// BASE64_CODEC / 编解码</h2>
+
+    <!-- 文本编解码 -->
+    <div class="mb-6">
+        <h3 class="text-xs text-emerald-400 mb-2 font-bold">文本 ↔ Base64</h3>
+        <div class="flex gap-2 mb-3">
+            <button onclick="encodeText()" class="bg-emerald-600 hover:bg-emerald-500 text-black font-bold px-4 py-2 rounded text-xs tracking-wider transition">编码 / ENCODE</button>
+            <button onclick="decodeText()" class="bg-stone-700 hover:bg-stone-600 text-stone-200 font-bold px-4 py-2 rounded text-xs tracking-wider transition">解码 / DECODE</button>
+            <button onclick="swapText()" class="border border-stone-700 text-stone-400 hover:text-stone-200 px-4 py-2 rounded text-xs transition">↔ 交换</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-[10px] text-stone-500 mb-1">明文 / Plain Text</label>
+                <textarea id="plainText" rows="6" placeholder="输入文本..." class="w-full bg-stone-800 border border-stone-700 rounded-lg p-3 text-stone-200 text-sm font-mono focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+            </div>
+            <div>
+                <label class="block text-[10px] text-stone-500 mb-1">Base64 编码</label>
+                <textarea id="base64Text" rows="6" placeholder="或输入Base64字符串..." class="w-full bg-stone-800 border border-stone-700 rounded-lg p-3 text-stone-200 text-sm font-mono focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+            </div>
+        </div>
+        <div id="textMsg" class="text-[10px] mt-2"></div>
+    </div>
+
+    <hr class="border-stone-800 my-4">
+
+    <!-- 图片转Base64 -->
+    <div>
+        <h3 class="text-xs text-emerald-400 mb-2 font-bold">图片 → Base64</h3>
+        <div class="flex items-center gap-3 mb-3">
+            <label class="bg-stone-700 hover:bg-stone-600 text-stone-200 font-bold px-4 py-2 rounded text-xs tracking-wider transition cursor-pointer">
+                选择图片 <input type="file" id="imageFile" accept="image/*" onchange="imageToBase64()" class="hidden">
+            </label>
+            <span class="text-[10px] text-stone-500">支持 PNG/JPG/GIF/WebP</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-[10px] text-stone-500 mb-1">图片预览</label>
+                <div id="imagePreview" class="bg-stone-800 border border-stone-700 rounded-lg p-3 h-40 flex items-center justify-center text-xs text-stone-600">暂无图片</div>
+            </div>
+            <div>
+                <label class="block text-[10px] text-stone-500 mb-1">Base64 编码 <button onclick="copyBase64()" class="text-emerald-400 hover:text-emerald-300 text-[10px] ml-2">📋 复制</button></label>
+                <textarea id="imageBase64" rows="6" readonly placeholder="图片的Base64编码将显示在这里..." class="w-full bg-stone-800 border border-stone-700 rounded-lg p-3 text-stone-200 text-xs font-mono focus:outline-none resize-none"></textarea>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="tool-footer-note max-w-none">
+    <hr class="border-stone-800 my-4">
+    <p class="text-xs text-stone-500 leading-relaxed mb-2">📝 这个工具是因为把一张截图塞进JSON配置文件里——网上找的在线Base64工具全都要求上传，我怕数据泄露。Base64编解码其实浏览器原生就支持，几行JS的事。</p>
+    <p class="text-xs text-stone-500 leading-relaxed">代码很糙，但能用。如果对你有用，欢迎<a href="../../../support.html" class="text-emerald-400 underline hover:text-emerald-300">请我喝杯咖啡</a>。</p>
+</div>
+
+</main>
+
+<footer class="border-t border-stone-800 bg-stone-950 px-6 py-6">
+    <div class="max-w-4xl mx-auto text-center space-y-2">
+        <p class="text-[11px] text-stone-500">© 2026 laomunong.com All Rights Reserved.</p>
+        <p class="text-[10px] text-stone-600">🛡️ 本工具为纯客户端运行，数据绝不上传服务器。</p>
+        <a href="../../../privacy-policy.html" class="text-[10px] text-stone-500 underline hover:text-emerald-400 transition-colors">隐私政策 / Privacy Policy</a>
+    </div>
+</footer>
+
+<script>
+function encodeText() {
+    var text = document.getElementById('plainText').value;
+    if (!text) { showMsg('请输入文本', 'text-stone-500'); return; }
+    try {
+        document.getElementById('base64Text').value = btoa(unescape(encodeURIComponent(text)));
+        showMsg('✅ 编码成功', 'text-emerald-400');
+    } catch(e) { showMsg('❌ 编码失败: ' + e.message, 'text-red-400'); }
+}
+
+function decodeText() {
+    var b64 = document.getElementById('base64Text').value.trim();
+    if (!b64) { showMsg('请输入Base64字符串', 'text-stone-500'); return; }
+    try {
+        document.getElementById('plainText').value = decodeURIComponent(escape(atob(b64)));
+        showMsg('✅ 解码成功', 'text-emerald-400');
+    } catch(e) { showMsg('❌ 解码失败: 无效的Base64字符串', 'text-red-400'); }
+}
+
+function swapText() {
+    var plain = document.getElementById('plainText').value;
+    var b64 = document.getElementById('base64Text').value;
+    document.getElementById('plainText').value = '';
+    document.getElementById('base64Text').value = plain;
+    showMsg('已交换（明文→Base64框）', 'text-stone-500');
+}
+
+function imageToBase64() {
+    var file = document.getElementById('imageFile').files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('imageBase64').value = e.target.result;
+        document.getElementById('imagePreview').innerHTML = '<img src="'+e.target.result+'" class="max-h-36 rounded" alt="preview">';
+        showMsg('✅ 图片已编码 (' + (e.target.result.length/1024).toFixed(1) + ' KB)', 'text-emerald-400');
+    };
+    reader.readAsDataURL(file);
+}
+
+function copyBase64() {
+    var b64 = document.getElementById('imageBase64').value;
+    if (!b64) { showMsg('没有可复制的内容', 'text-stone-500'); return; }
+    navigator.clipboard.writeText(b64).then(function() {
+        showMsg('✅ 已复制到剪贴板', 'text-emerald-400');
+    }).catch(function() {
+        showMsg('复制失败，请手动选择文本', 'text-red-400');
+    });
+}
+
+function showMsg(msg, cls) {
+    var el = document.getElementById('textMsg');
+    el.textContent = msg;
+    el.className = 'text-[10px] mt-2 ' + cls;
+}
+</script>
+</body>
+</html>
