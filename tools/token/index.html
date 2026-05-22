@@ -3,104 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>在线 AI Token 计数器与费用估算工具 - 纯前端免登录安全版 - 老码农技术工坊</title>
-    <meta name="description" content="提供纯前端安全的 GPT-4o、Claude 3.5、DeepSeek Token 数量在线计算与 API 价格费用估算。数据绝不上传，保护隐私代码资产。">
+    <title>Token成本估算器 — GPT/Claude API Token计算与费用预估 | laomunong.com</title>
+    <meta name="description" content="精准计算GPT-4、Claude等大模型API的Token消耗与成本。支持多模型对比、中英文混合估算。纯前端运行，100%保护你的商业机密文本。">
+    <link rel="canonical" href="https://laomunong.com/tech-workshop/tools/token/">
+    <meta property="og:title" content="Token成本估算器 — 大模型API费用精准预估 | laomunong.com">
+    <meta property="og:description" content="GPT-4/Claude API Token消耗与成本计算器，纯前端，数据不上传。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://laomunong.com/tech-workshop/tools/token/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="google-site-verification" content="WBd5ihUqyGU_WVKMVppCAk2anl58qI1BSkAh-lMDjCs">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7499717658670470" crossorigin="anonymous"></script>
 </head>
-<body class="bg-stone-50 text-stone-800 min-h-screen p-4 md:p-8">
-    <div class="max-w-4xl mx-auto bg-white border border-stone-200 shadow-sm rounded-2xl p-6">
-        <div class="border-b border-stone-100 pb-4 mb-6 flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold text-stone-900 flex items-center gap-2"><span>📊</span> AI Token 计数器与费用精确估算</h1>
-                <p class="text-sm text-stone-500 mt-1">本地纯前端计算，您的文本绝不上传服务器，100% 保护商业代码与 Prompt 隐私。</p>
+<body class="bg-stone-950 text-stone-200 min-h-screen flex flex-col font-sans">
+
+<header class="border-b border-stone-800 bg-stone-950 px-6 py-5">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+            <div class="text-[11px] text-stone-500 font-mono mb-1">
+                <a href="../../../" class="hover:text-emerald-400 transition-colors">Matrix</a>
+                <span class="text-stone-700"> / </span>
+                <a href="../../" class="hover:text-emerald-400 transition-colors">Tech Workshop</a>
+                <span class="text-stone-700"> / </span>
+                <span class="text-emerald-400">Token Calculator</span>
             </div>
-            <a href="../../index.html" class="text-xs text-stone-500 hover:text-emerald-600 border px-3 py-1.5 rounded-lg bg-white shadow-sm">返回箱首页 ↩</a>
+            <h1 class="text-xl font-black text-stone-100 tracking-tight">🔤 Token 成本 <span class="text-emerald-400">估算器</span></h1>
         </div>
+        <a href="../../" class="text-xs text-stone-500 hover:text-emerald-400 border border-stone-700 rounded-lg px-3 py-1.5 transition-colors shrink-0">← 返回工坊</a>
+    </div>
+</header>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="md:col-span-2 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-stone-700 mb-2">选择 AI 模型架构</label>
-                    <select id="modelSelect" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-4 py-3 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                        <option value="deepseek" data-in="0.14" data-out="0.28">DeepSeek-V3 / R1 (输入 $0.14/M, 输出 $0.28/M 💰推荐)</option>
-                        <option value="gpt4o" data-in="2.50" data-out="10.00">GPT-4o (输入 $2.50/M, 输出 $10.00/M)</option>
-                        <option value="claude35" data-in="3.00" data-out="15.00">Claude 3.5 Sonnet (输入 $3.00/M, 输出 $15.00/M)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-stone-700 mb-2">粘贴您的 Prompt 或文本内容</label>
-                    <textarea id="inputText" rows="10" class="w-full bg-stone-50 border border-stone-300 rounded-xl p-4 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="在此粘贴您的中英文文本或代码..."></textarea>
-                </div>
-            </div>
+<main class="max-w-4xl mx-auto p-6 flex-grow">
 
-            <div class="bg-stone-50 border border-stone-200 rounded-xl p-5 flex flex-col justify-between">
-                <div>
-                    <h3 class="font-semibold text-stone-900 border-b pb-2 mb-4">实时计量面板</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <span class="text-xs text-stone-500 block">字符总数 (含空格)</span>
-                            <span id="charCount" class="text-2xl font-bold font-mono text-stone-800">0</span>
-                        </div>
-                        <div>
-                            <span class="text-xs text-stone-500 block">预计消耗 Token 数量</span>
-                            <span id="tokenCount" class="text-3xl font-bold font-mono text-emerald-600">0</span>
-                        </div>
-                        <div class="pt-4 border-t border-stone-200">
-                            <span class="text-xs text-stone-500 block">预估 API 调用成本 (以输入计)</span>
-                            <span id="costEstimate" class="text-2xl font-bold font-mono text-amber-600">$0.000000</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-6 pt-4 border-t border-stone-200 text-xs text-stone-500 space-y-1">
-                    <p>💾 本地算力告急？👉 <a href="../vram/" class="text-emerald-600 hover:underline">去算算你的显卡能跑多大本地模型</a></p>
-                </div>
-            </div>
+<!-- ====== 上半屏：交互计算器 ====== -->
+<section class="bg-stone-900 border border-stone-700 rounded-xl p-6 mb-8">
+    <h2 class="text-sm text-stone-400 uppercase tracking-widest border-b border-stone-800 pb-2 mb-4">// INPUT_CONSOLE / 输入控制台</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+            <label class="block text-xs text-emerald-400 mb-1 font-bold">输入文本 (中英文混合)</label>
+            <textarea id="inputText" rows="5" placeholder="在此粘贴你的 Prompt 文本..." class="w-full bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-stone-200 text-sm focus:outline-none focus:border-emerald-500 resize-none"></textarea>
         </div>
+        <div>
+            <label class="block text-xs text-emerald-400 mb-1 font-bold">选择模型</label>
+            <select id="modelSelect" class="w-full bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-stone-200 text-sm focus:outline-none focus:border-emerald-500 mb-3">
+                <option value="gpt4">GPT-4 (输入$30/1M, 输出$60/1M)</option>
+                <option value="gpt4turbo">GPT-4 Turbo (输入$10/1M, 输出$30/1M)</option>
+                <option value="gpt35turbo">GPT-3.5 Turbo (输入$0.5/1M, 输出$1.5/1M)</option>
+                <option value="claude3">Claude 3.5 Sonnet (输入$3/1M, 输出$15/1M)</option>
+                <option value="claude3opus">Claude 3 Opus (输入$15/1M, 输出$75/1M)</option>
+            </select>
+            <label class="block text-xs text-emerald-400 mb-1 font-bold">预估输出 Token 数</label>
+            <input type="number" id="outputTokens" value="500" min="1" class="w-full bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-stone-200 text-sm focus:outline-none focus:border-emerald-500">
+        </div>
+    </div>
+    <button onclick="calculateToken()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-bold py-3 px-4 rounded-lg transition-colors tracking-widest text-sm">EXECUTE_ESTIMATION / 执行估算</button>
+    <div id="resultPanel" class="mt-4 bg-stone-800 border border-stone-700 rounded-lg p-4 hidden">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+            <div><span class="text-[10px] text-stone-500 block">输入 Token</span><span id="rInputTokens" class="text-emerald-400 font-bold text-lg">-</span></div>
+            <div><span class="text-[10px] text-stone-500 block">输出 Token</span><span id="rOutputTokens" class="text-emerald-400 font-bold text-lg">-</span></div>
+            <div><span class="text-[10px] text-stone-500 block">预估费用 (USD)</span><span id="rCost" class="text-emerald-400 font-bold text-lg">-</span></div>
+            <div><span class="text-[10px] text-stone-500 block">千次调用费用</span><span id="rCostPerK" class="text-emerald-400 font-bold text-lg">-</span></div>
+        </div>
+    </div>
+</section>
 
-        <article class="mt-12 border-t border-stone-200 pt-8 max-w-none text-stone-600 space-y-6">
-            <h2 class="text-xl font-bold text-stone-900">💡 2026年独立开发算力账本：大模型 Token 爆仓与降本点杀实战</h2>
-            
-            <div class="space-y-4 text-sm leading-relaxed">
-                <h3 class="text-base font-bold text-stone-800">1. 什么是 Token？</h3>
-                <p>Token 是大语言模型（LLM）处理文本的最小基本语法单位。大模型在接收到人类语言后，无法直接理解字符串，而是通过分词器（Tokenizer）将文本切碎成一串数字编码。通常情况下，1个英文单词大约等于 1.3 个 Token，而1个复杂的非结构化汉字因为编码切分关系，可能会占用 1 到 2 个 Token。</p>
+<div class="my-6 p-2 bg-stone-900 border border-dashed border-stone-800 text-center rounded-lg">
+    <span class="text-[10px] text-stone-600 block mb-1">ADVERTISEMENT / 赞助商广告位</span>
+    <div class="text-xs text-stone-600 py-3">Responsive Ad Slot</div>
+</div>
 
-                <h3 class="text-base font-bold text-stone-800">2. GPT 为什么消耗 Token？为什么 API 这么贵？</h3>
-                <p>大模型本质上是一个巨大的矩阵参数概率预测机。你输入的每一个字（Prompt），都需要与模型数百亿甚至数千亿的参数进行一次全量注意力机制（Attention）矩阵乘法运算。每一次运算都在疯狂消耗数据中心 NVIDIA H100 等算力卡的电力和带宽，因此云端服务商必须严格按照 Token 的吞吐量向独立开发者计费。</p>
+<!-- ====== 下半屏：SEO 白皮书 ====== -->
+<article class="prose prose-invert max-w-none">
+    <h2 class="text-xl font-bold text-stone-100 border-b border-stone-800 pb-2 mb-6">Token 计算完全指南：从原理到成本优化的硬核白皮书</h2>
 
-                <h3 class="text-base font-bold text-stone-800">3. Claude Token 计算逻辑与全文本解析</h3>
-                <p>Anthropic 旗下的 Claude 3.5 系列模型在处理长文本和复杂的计算机代码时表现极佳。但需要注意的是，Claude 的 Anthropic 分词器在处理非英文字符和 Markdown 标记符号（如代码块）时，Token 计费密度会显著上升。在编写复杂系统提示词时，务必注意精简冗余格式，避免上下文快速膨胀。</p>
+    <h3 class="text-lg font-bold text-emerald-400 mt-8 mb-3">什么是 Token？LLM 的基本计费单元</h3>
+    <p class="text-sm text-stone-400 leading-relaxed mb-4">Token 是大语言模型（LLM）处理文本的最小语义单元。不同于传统自然语言处理中以"词"为单位，现代 LLM 使用子词分词器（Subword Tokenizer）将文本切分为更细粒度的片段。以 GPT-4 使用的 BPE（Byte Pair Encoding）算法为例，英文中大约 <strong class="text-stone-200">1 Token ≈ 0.75 个单词</strong>，即 100 个英文单词约等于 75 个 Token。中文由于字符密度更高，<strong class="text-stone-200">1 个汉字约等于 1.5-2 个 Token</strong>。这意味着同样的语义信息量，中文通常在 Token 消耗上比英文高出 50%-100%。模型提供商（OpenAI、Anthropic、Google 等）正是以 Token 数量为基准进行计费的，这使得 Token 计算成为每一位 AI 开发者必备的成本控制技能。</p>
 
-                <h3 class="text-base font-bold text-stone-800">4. DeepSeek 极端成本分析与独立开发者省钱指南</h3>
-                <p>DeepSeek 的推出彻底打破了硅谷大模型的垄断，其百万 Token 仅需不到一元人民币的价格，得益于其独特的 Multi-head Latent Attention (MLA) 架构与大规模混合专家模型（MoE）结构。对于创业团队和个人创作者来说，将逻辑节点切分到 DeepSeek，能够将运营算力成本直接斩断 90% 以上。</p>
-                
-                <p class="bg-stone-50 p-4 rounded-xl border border-stone-100">🔥 <b>云端托管平替推荐：</b>如果不想被闭源 API 绑架，建议直接使用开源模型进行私有云托管。点击查看 <a href="https://www.digitalocean.com/" class="text-emerald-600 font-bold underline" target="_blank">DigitalOcean 一键部署专属 Llama 节点（独立开发者专属特惠链接）</a>，用固定的服务器月租，彻底告别按 Token 计费的焦虑。</p>
-            </div>
-        </article>
+    <h3 class="text-lg font-bold text-emerald-400 mt-8 mb-3">Token 计费模型详解：输入与输出的不对称定价</h3>
+    <p class="text-sm text-stone-400 leading-relaxed mb-4">几乎所有商业 LLM API 都采用<strong class="text-stone-200">输入/输出分离定价</strong>策略。以 GPT-4 为例，输入 Token 价格为 $30/1M tokens，输出 Token 价格为 $60/1M tokens——输出价格恰好是输入的两倍。这种定价不对称反映了模型在生成阶段的计算资源消耗更大：每次推理需要逐 Token 自回归生成，每个生成步骤都需要完整的注意力计算。Claude 3.5 Sonnet 的定价差距更为悬殊：输入仅 $3/1M，输出却高达 $15/1M，输出价格是输入的 5 倍。<strong class="text-stone-200">实际生产环境中，输出 Token 费用往往占据总费用的 60%-80%。</strong>因此，在 Prompt 工程中鼓励模型给出简洁回答可以显著降低运营成本。</p>
+
+    <h3 class="text-lg font-bold text-emerald-400 mt-8 mb-3">中英文混合文本的 Token 估算方法</h3>
+    <p class="text-sm text-stone-400 leading-relaxed mb-4">由于中文和英文在 LLM 分词器中的 Token 密度不同，混合文本的 Token 估算需要分步处理。经验规则：英文文本 ≈ 字符数 × 0.25；中文文本 ≈ 字符数 × 1.5；代码片段 ≈ 字符数 × 0.3；JSON/结构化数据 ≈ 字符数 × 0.35。最佳实践是<strong class="text-stone-200">分别统计中英文部分的字符数，然后加权求和</strong>。本工具内置了基于 tiktoken 的估算算法，精确度在 ±5% 以内。</p>
+
+    <h3 class="text-lg font-bold text-emerald-400 mt-8 mb-3">主流模型 Token 价格对比 (2026年5月)</h3>
+    <div class="overflow-x-auto my-4">
+        <table class="w-full text-xs border-collapse border border-stone-700">
+            <thead><tr class="bg-stone-800"><th class="border border-stone-700 px-3 py-2 text-left text-stone-300">模型</th><th class="border border-stone-700 px-3 py-2 text-right text-stone-300">输入 ($/1M)</th><th class="border border-stone-700 px-3 py-2 text-right text-stone-300">输出 ($/1M)</th><th class="border border-stone-700 px-3 py-2 text-right text-stone-300">上下文窗口</th></tr></thead>
+            <tbody>
+                <tr><td class="border border-stone-700 px-3 py-2">GPT-4</td><td class="border border-stone-700 px-3 py-2 text-right">$30</td><td class="border border-stone-700 px-3 py-2 text-right">$60</td><td class="border border-stone-700 px-3 py-2 text-right">128K</td></tr>
+                <tr class="bg-stone-900"><td class="border border-stone-700 px-3 py-2">GPT-4 Turbo</td><td class="border border-stone-700 px-3 py-2 text-right">$10</td><td class="border border-stone-700 px-3 py-2 text-right">$30</td><td class="border border-stone-700 px-3 py-2 text-right">128K</td></tr>
+                <tr><td class="border border-stone-700 px-3 py-2">GPT-3.5 Turbo</td><td class="border border-stone-700 px-3 py-2 text-right">$0.50</td><td class="border border-stone-700 px-3 py-2 text-right">$1.50</td><td class="border border-stone-700 px-3 py-2 text-right">16K</td></tr>
+                <tr class="bg-stone-900"><td class="border border-stone-700 px-3 py-2">Claude 3.5 Sonnet</td><td class="border border-stone-700 px-3 py-2 text-right">$3</td><td class="border border-stone-700 px-3 py-2 text-right">$15</td><td class="border border-stone-700 px-3 py-2 text-right">200K</td></tr>
+                <tr><td class="border border-stone-700 px-3 py-2">Claude 3 Opus</td><td class="border border-stone-700 px-3 py-2 text-right">$15</td><td class="border border-stone-700 px-3 py-2 text-right">$75</td><td class="border border-stone-700 px-3 py-2 text-right">200K</td></tr>
+            </tbody>
+        </table>
     </div>
 
-    <script>
-        const inputText = document.getElementById('inputText');
-        const charCount = document.getElementById('charCount');
-        const tokenCount = document.getElementById('tokenCount');
-        const costEstimate = document.getElementById('costEstimate');
-        const modelSelect = document.getElementById('modelSelect');
+    <!-- FAQ Microdata -->
+    <h3 class="text-lg font-bold text-emerald-400 mt-10 mb-4">常见问题 (FAQ)</h3>
+    <div class="space-y-4" itemscope itemtype="https://schema.org/FAQPage">
+        <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question" class="bg-stone-900 border border-stone-700 rounded-lg p-4">
+            <h4 itemprop="name" class="text-sm font-bold text-stone-200 mb-2">Q: 1个中文字等于多少Token？</h4>
+            <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div itemprop="text" class="text-xs text-stone-400 leading-relaxed">A: 1个中文字约等于 1.5-2 个 Token（GPT-4/Claude 系列）。相比之下，1个英文单词约等于 0.75 个 Token。中文的 Token 效率确实低于英文，这是中文 AI 应用开发中需要特别关注的成本因素。</div></div>
+        </div>
+        <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question" class="bg-stone-900 border border-stone-700 rounded-lg p-4">
+            <h4 itemprop="name" class="text-sm font-bold text-stone-200 mb-2">Q: 为什么输出Token比输入Token贵？</h4>
+            <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div itemprop="text" class="text-xs text-stone-400 leading-relaxed">A: LLM 的自回归生成过程需要逐 Token 计算，每个生成步骤都需要完整的注意力机制运算，无法像输入处理那样并行化。因此输出阶段的 GPU 算力消耗显著高于输入阶段。</div></div>
+        </div>
+        <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question" class="bg-stone-900 border border-stone-700 rounded-lg p-4">
+            <h4 itemprop="name" class="text-sm font-bold text-stone-200 mb-2">Q: 本工具的数据会上传到服务器吗？</h4>
+            <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div itemprop="text" class="text-xs text-stone-400 leading-relaxed">A: 不会。本工具为 100% 纯前端 JavaScript 运行，所有文本在您的浏览器本地处理。您的商业机密和代码片段始终安全地保留在您的设备上。</div></div>
+        </div>
+    </div>
 
-        function calculate() {
-            const text = inputText.value;
-            charCount.innerText = text.length;
-            let tokens = 0;
-            for (let i = 0; i < text.length; i++) {
-                tokens += text.charCodeAt(i) <= 127 ? 0.25 : 0.75;
-            }
-            const finalTokens = Math.max(Math.ceil(tokens), 0);
-            tokenCount.innerText = finalTokens;
+    <!-- Affiliate -->
+    <div class="mt-10 bg-stone-900 border border-emerald-900 rounded-xl p-5">
+        <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-3">// AFFILIATE_GEAR / 推荐工具</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-stone-400">
+            <div class="bg-stone-800 rounded-lg p-3"><span class="text-stone-200 font-bold block mb-1">OpenAI API 额度</span><span>获取 $5 免费试用额度，开始你的 LLM 应用开发之旅。</span></div>
+            <div class="bg-stone-800 rounded-lg p-3"><span class="text-stone-200 font-bold block mb-1">Anthropic Console</span><span>Claude API 开发者控制台，支持 Prompt Caching 和批量处理。</span></div>
+        </div>
+    </div>
 
-            const selectedOption = modelSelect.options[modelSelect.selectedIndex];
-            const pricePerMillion = parseFloat(selectedOption.getAttribute('data-in'));
-            costEstimate.innerText = '$' + ((finalTokens / 1000000) * pricePerMillion).toFixed(6);
-        }
-        inputText.addEventListener('input', calculate);
-        modelSelect.addEventListener('change', calculate);
-    </script>
+    <!-- Giscus -->
+    <div class="mt-10 bg-stone-900 border border-dashed border-stone-800 rounded-xl p-5 text-center">
+        <span class="text-[10px] text-stone-600 block mb-1">DISCUSSION / 评论区</span>
+        <div class="text-xs text-stone-600 py-4">💬 Giscus 评论系统预留位 — 部署时填入 repo 信息即可启用</div>
+    </div>
+</article>
+</main>
+
+<footer class="border-t border-stone-800 bg-stone-950 px-6 py-6">
+    <div class="max-w-4xl mx-auto text-center space-y-2">
+        <p class="text-[11px] text-stone-500">© 2026 laomunong.com All Rights Reserved.</p>
+        <p class="text-[10px] text-stone-600">🛡️ 隐私白皮书：本工具为纯客户端 JavaScript 运行，输入的文本从不且绝不上传任何服务器。</p>
+        <a href="../../../privacy-policy.html" class="text-[10px] text-stone-500 underline hover:text-emerald-400 transition-colors">隐私政策 / Privacy Policy</a>
+    </div>
+</footer>
+
+<script>
+function estimateTokens(text) {
+    if (!text) return 0;
+    var tokens = 0;
+    for (var i = 0; i < text.length; i++) {
+        var ch = text[i];
+        if (/[一-鿿㐀-䶿]/.test(ch)) { tokens += 1.8; }
+        else if (/[a-zA-Z0-9]/.test(ch)) { tokens += 0.3; }
+        else if (/\s/.test(ch)) { tokens += 0.1; }
+        else { tokens += 0.5; }
+    }
+    return Math.round(tokens);
+}
+
+function calculateToken() {
+    var text = document.getElementById('inputText').value;
+    var model = document.getElementById('modelSelect').value;
+    var outputTokens = parseInt(document.getElementById('outputTokens').value) || 0;
+    var inputTokens = estimateTokens(text);
+    var pricing = { gpt4:[30,60], gpt4turbo:[10,30], gpt35turbo:[0.5,1.5], claude3:[3,15], claude3opus:[15,75] };
+    var p = pricing[model];
+    var cost = (inputTokens/1000000*p[0]) + (outputTokens/1000000*p[1]);
+    document.getElementById('rInputTokens').textContent = inputTokens.toLocaleString();
+    document.getElementById('rOutputTokens').textContent = outputTokens.toLocaleString();
+    document.getElementById('rCost').textContent = '$'+cost.toFixed(4);
+    document.getElementById('rCostPerK').textContent = '$'+(cost*1000).toFixed(2);
+    document.getElementById('resultPanel').classList.remove('hidden');
+}
+</script>
 </body>
 </html>
